@@ -3,7 +3,9 @@ name = "job-book"
 version = "0.1.0"
 authors = ["ZhengYu, Xu <zen-xu@outlook.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Use a yaml file to stitch scripts and commands together."
+license = "Apache-2.0"
+repository = "https://github.com/zen-xu/job-book"
+categories = ["command-line-utilities"]
 
 [dependencies]
