@@ -9,3 +9,4 @@ repository = "https://github.com/zen-xu/job-book"
 version = "0.1.0"
 
 [dependencies]
+clap = "2.33"
