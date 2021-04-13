@@ -1,7 +1,7 @@
 [package]
 authors = ["ZhengYu, Xu <zen-xu@outlook.com>"]
 categories = ["command-line-utilities"]
-description = "Use a yaml file to stitch scripts and commands together."
+description = "A tool stitches scripts and commands together by YAML."
 edition = "2018"
 license = "Apache-2.0"
 name = "job-book"
