@@ -1,11 +1,11 @@
 [package]
-name = "job-book"
-version = "0.1.0"
 authors = ["ZhengYu, Xu <zen-xu@outlook.com>"]
-edition = "2018"
-description = "Use a yaml file to stitch scripts and commands together."
-license = "Apache-2.0"
-repository = "https://github.com/zen-xu/job-book"
 categories = ["command-line-utilities"]
+description = "Use a yaml file to stitch scripts and commands together."
+edition = "2018"
+license = "Apache-2.0"
+name = "job-book"
+repository = "https://github.com/zen-xu/job-book"
+version = "0.1.0"
 
 [dependencies]
