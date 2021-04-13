@@ -1,7 +1,6 @@
-#[macro_use]
 extern crate clap;
 
-use clap::{crate_name, crate_version, App, AppSettings};
+use clap::{clap_app, crate_name, crate_version, App, AppSettings};
 
 fn build_app() -> App<'static, 'static> {
     let app = clap_app!(app =>
@@ -16,11 +15,26 @@ fn build_app() -> App<'static, 'static> {
         (setting: AppSettings::AllowExternalSubcommands)
         (setting: AppSettings::DisableHelpSubcommand)
         (setting: AppSettings::VersionlessSubcommands)
+
+        (@subcommand run =>
+            (about: "Execute the given YAML.")
+            (@arg YAML: +required "The YAML need to run.")
+            (@arg tags: -t --tag +use_delimiter ... "Execute tasks whose tags are matched.")
+            (@arg exclude: -e --exclude +use_delimiter  ... "Execute tasks whose tags are not matched.")
+        )
     );
 
     app
 }
 
 fn main() {
-    build_app().get_matches();
+    let matches = build_app().get_matches();
+
+    match matches.subcommand() {
+        ("run", Some(sub_m)) => {
+            let tags = sub_m.values_of("tags").unwrap().collect::<Vec<_>>();
+            println!("{:?}", tags)
+        }
+        _ => {}
+    }
 }
