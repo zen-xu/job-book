@@ -28,13 +28,5 @@ fn build_app() -> App<'static, 'static> {
 }
 
 fn main() {
-    let matches = build_app().get_matches();
-
-    match matches.subcommand() {
-        ("run", Some(sub_m)) => {
-            let tags = sub_m.values_of("tags").unwrap().collect::<Vec<_>>();
-            println!("{:?}", tags)
-        }
-        _ => {}
-    }
+    build_app().get_matches();
 }
