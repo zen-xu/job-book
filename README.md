@@ -17,3 +17,13 @@
   A tool stitches scripts and commands together by YAML.
 </div>
 
+### Features
+
+- [ ] Run bash snippets in series or parallel
+- [ ] Support `python`, `ruby`, `javascript`, etc snippets
+- [ ] Support TUI
+- [ ] Support to download url references to scripts and execute
+- [ ] Support to get task logs
+- [ ] Support to rerun failed tasks
+- [ ] Support to handle failed tasks by scripts (`bash`, `python`, `ruby`, `javascript`, etc)
+- [ ] Support to show job status with a nice progress bar
