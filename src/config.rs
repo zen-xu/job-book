@@ -2,8 +2,6 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::collection;
-
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
 #[serde(deny_unknown_fields)]
 #[serde(default)]
@@ -76,6 +74,8 @@ impl Default for Language {
 
 #[cfg(test)]
 mod tests {
+    use crate::collection;
+
     use super::*;
 
     #[test]
