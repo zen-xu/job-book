@@ -1,4 +1,8 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
+
+use crate::collection;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
 #[serde(deny_unknown_fields)]
@@ -11,14 +15,12 @@ pub struct JobConfig {
     /// job level limits the max total parallel tasks that can execute at the same time
     pub parallelism: Option<i32>,
     /// a series of templates
-    pub templates: Vec<Template>,
+    pub templates: HashMap<String, Template>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Template {
-    /// template name
-    pub name: String,
     /// template level limits the max total parallel tasks that can execute at the same time
     pub parallelism: Option<i32>,
     /// a series of sequential/parallel tasks
@@ -82,10 +84,10 @@ mod tests {
             name: "job".to_string(),
             parallelism: None,
             entrypoint: "main".to_string(),
-            templates: vec![Template {
-                name: "main".to_string(),
-                parallelism: None,
-                tasks: vec![vec![TaskConfig {
+            templates: collection! {
+                "main".to_string() => Template {
+                    parallelism: None,
+                    tasks: vec![vec![TaskConfig {
                     name: "".to_string(),
                     kind: TaskKind::Script {
                         script: "echo hello".to_string(),
@@ -93,7 +95,8 @@ mod tests {
                         cwd: ".".to_string(),
                     },
                 }]],
-            }],
+            }
+            },
         };
 
         let yaml_str = r#"
@@ -101,9 +104,9 @@ mod tests {
 name: job
 entrypoint: main
 templates:
-- name: main
-  tasks:
-  - - script: echo hello
+  main:
+    tasks:
+    - - script: echo hello
 "#;
         let deserialized_config: JobConfig = serde_yaml::from_str(yaml_str).unwrap();
         assert_eq!(config, deserialized_config);
@@ -115,9 +118,8 @@ templates:
             name: "job".to_string(),
             entrypoint: "main".to_string(),
             parallelism: Some(2),
-            templates: vec![
-                Template {
-                    name: "main".to_string(),
+            templates: collection! {
+                "main".to_string() => Template {
                     parallelism: None,
                     tasks: vec![vec![TaskConfig {
                         name: "".to_string(),
@@ -126,8 +128,7 @@ templates:
                         },
                     }]],
                 },
-                Template {
-                    name: "run_it".to_string(),
+                "run_it".to_string() => Template {
                     parallelism: None,
                     tasks: vec![vec![TaskConfig {
                         name: "".to_string(),
@@ -138,22 +139,23 @@ templates:
                         },
                     }]],
                 },
-            ],
+            },
         };
+
         let yaml_str = r#"
 ---
 name: job
 entrypoint: main
 parallelism: 2
 templates:
-- name: main
-  tasks:
-  - - template: run_it
-- name: run_it
-  tasks:
-  - - script: print("hello")
-      language: python
-      cwd: /home
+  main:
+    tasks:
+      - - template: run_it
+  run_it:
+    tasks:
+      - - script: "print(\"hello\")"
+          language: python
+          cwd: /home
 "#;
         let deserialized_config: JobConfig = serde_yaml::from_str(yaml_str).unwrap();
         assert_eq!(config, deserialized_config);
