@@ -25,11 +25,17 @@ pub struct Template {
     pub tasks: Vec<Vec<TaskConfig>>,
 }
 
+#[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
+pub struct TaskLabels(Vec<String>);
+
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct TaskConfig {
     /// job name
     #[serde(default)]
     pub name: String,
+    /// job labels
+    #[serde(default)]
+    pub labels: TaskLabels,
     #[serde(flatten)]
     pub kind: TaskKind,
 }
@@ -88,14 +94,15 @@ mod tests {
                 "main".to_string() => Template {
                     parallelism: None,
                     tasks: vec![vec![TaskConfig {
-                    name: "".to_string(),
-                    kind: TaskKind::Script {
-                        script: "echo hello".to_string(),
-                        language: Language::Bash,
-                        cwd: ".".to_string(),
-                    },
-                }]],
-            }
+                        name: "".to_string(),
+                        labels: TaskLabels(vec![]),
+                        kind: TaskKind::Script {
+                            script: "echo hello".to_string(),
+                            language: Language::Bash,
+                            cwd: ".".to_string(),
+                        },
+                    }]],
+                }
             },
         };
 
@@ -123,6 +130,7 @@ templates:
                     parallelism: None,
                     tasks: vec![vec![TaskConfig {
                         name: "".to_string(),
+                        labels: TaskLabels(vec!["first".to_string()]),
                         kind: TaskKind::Template {
                             template: "run_it".to_string(),
                         },
@@ -132,6 +140,7 @@ templates:
                     parallelism: None,
                     tasks: vec![vec![TaskConfig {
                         name: "".to_string(),
+                        labels: TaskLabels(vec!["second".to_string(), "third".to_string()]),
                         kind: TaskKind::Script {
                             script: "print(\"hello\")".to_string(),
                             language: Language::Python,
@@ -151,11 +160,13 @@ templates:
   main:
     tasks:
       - - template: run_it
+          labels: [first]
   run_it:
     tasks:
       - - script: "print(\"hello\")"
           language: python
           cwd: /home
+          labels: [second, third]
 "#;
         let deserialized_config: JobConfig = serde_yaml::from_str(yaml_str).unwrap();
         assert_eq!(config, deserialized_config);
