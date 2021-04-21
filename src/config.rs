@@ -51,8 +51,8 @@ pub enum TaskKind {
         /// script body
         script: String,
         /// script language
-        #[serde(default)]
-        language: Language,
+        #[serde(default = "default_executor")]
+        executor: String,
         /// working dir
         #[serde(default = "default_cwd")]
         cwd: String,
@@ -63,19 +63,8 @@ fn default_cwd() -> String {
     ".".to_string()
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum Language {
-    Bash,
-    Python,
-    Ruby,
-    Javascript,
-}
-
-impl Default for Language {
-    fn default() -> Self {
-        Language::Bash
-    }
+fn default_executor() -> String {
+    "bash".to_string()
 }
 
 #[cfg(test)]
@@ -98,7 +87,7 @@ mod tests {
                         labels: TaskLabels(vec![]),
                         kind: TaskKind::Script {
                             script: "echo hello".to_string(),
-                            language: Language::Bash,
+                            executor: "bash".to_string(),
                             cwd: ".".to_string(),
                         },
                     }]],
@@ -143,7 +132,7 @@ templates:
                         labels: TaskLabels(vec!["second".to_string(), "third".to_string()]),
                         kind: TaskKind::Script {
                             script: "print(\"hello\")".to_string(),
-                            language: Language::Python,
+                            executor: "python".to_string(),
                             cwd: "/home".to_string(),
                         },
                     }]],
@@ -164,7 +153,7 @@ templates:
   run_it:
     tasks:
       - - script: "print(\"hello\")"
-          language: python
+          executor: python
           cwd: /home
           labels: [second, third]
 "#;
