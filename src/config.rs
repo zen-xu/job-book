@@ -56,12 +56,12 @@ pub enum TaskKind {
         #[serde(default)]
         executor_args: Vec<String>,
         /// working dir
-        #[serde(default = "default_cwd")]
-        cwd: String,
+        #[serde(default = "default_working_dir")]
+        working_dir: String,
     },
 }
 
-fn default_cwd() -> String {
+fn default_working_dir() -> String {
     ".".to_string()
 }
 
@@ -91,7 +91,7 @@ mod tests {
                             script: "echo hello".to_string(),
                             executor: "bash".to_string(),
                             executor_args: vec![],
-                            cwd: ".".to_string(),
+                            working_dir: ".".to_string(),
                         },
                     }]],
                 }
@@ -137,7 +137,7 @@ templates:
                             script: "print(\"hello\")".to_string(),
                             executor: "python".to_string(),
                             executor_args: vec!["-u".to_string()],
-                            cwd: "/home".to_string(),
+                            working_dir: "/home".to_string(),
                         },
                     }]],
                 },
@@ -159,7 +159,7 @@ templates:
       - - script: "print(\"hello\")"
           executor: python
           executor_args: [-u]
-          cwd: /home
+          working_dir: /home
           labels: [second, third]
 "#;
         let deserialized_config: JobConfig = serde_yaml::from_str(yaml_str).unwrap();
