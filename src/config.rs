@@ -53,6 +53,8 @@ pub enum TaskKind {
         /// script language
         #[serde(default = "default_executor")]
         executor: String,
+        #[serde(default)]
+        executor_args: Vec<String>,
         /// working dir
         #[serde(default = "default_cwd")]
         cwd: String,
@@ -88,6 +90,7 @@ mod tests {
                         kind: TaskKind::Script {
                             script: "echo hello".to_string(),
                             executor: "bash".to_string(),
+                            executor_args: vec![],
                             cwd: ".".to_string(),
                         },
                     }]],
@@ -133,6 +136,7 @@ templates:
                         kind: TaskKind::Script {
                             script: "print(\"hello\")".to_string(),
                             executor: "python".to_string(),
+                            executor_args: vec!["-u".to_string()],
                             cwd: "/home".to_string(),
                         },
                     }]],
@@ -154,6 +158,7 @@ templates:
     tasks:
       - - script: "print(\"hello\")"
           executor: python
+          executor_args: [-u]
           cwd: /home
           labels: [second, third]
 "#;
