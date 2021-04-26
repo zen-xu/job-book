@@ -106,6 +106,26 @@ impl JobConfig {
             .into());
         }
 
+        // check TaskKind template
+        for template in config.templates.values() {
+            for task_group in &template.tasks {
+                for task in task_group {
+                    match task.kind {
+                        TaskKind::Template { template: ref t } => {
+                            if !config.templates.contains_key(t) {
+                                return Err(Error::Message(format!(
+                                    "invalid template, no template names '{}'",
+                                    t
+                                ))
+                                .into());
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+
         return Ok(config);
     }
 }
@@ -222,6 +242,33 @@ templates:
             assert_eq!(
                 err.to_string(),
                 "invalid entrypoint, no template names 'main'".to_string()
+            );
+        } else {
+            panic!("should not find template")
+        }
+
+        let yaml_str = r#"
+---
+name: job
+entrypoint: main
+parallelism: 2
+templates:
+  main:
+    tasks:
+      - - template: run_it2
+          labels: [first]
+  run_it:
+    tasks:
+      - - script: "print(\"hello\")"
+          executor: python
+          executor_args: [-u]
+          working_dir: /home
+          labels: [second, third]
+        "#;
+        if let Err(err) = JobConfig::from_str(&yaml_str) {
+            assert_eq!(
+                err.to_string(),
+                "invalid template, no template names 'run_it2'".to_string()
             );
         } else {
             panic!("should not find template")
