@@ -1,6 +1,26 @@
 use std::collections::HashMap;
+use std::{
+    self,
+    fmt::{self, Display},
+    fs,
+};
 
 use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum Error {
+    Message(String),
+}
+
+impl Display for Error {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Error::Message(msg) => formatter.write_str(msg),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
 #[serde(deny_unknown_fields)]
@@ -67,6 +87,27 @@ fn default_working_dir() -> String {
 
 fn default_executor() -> String {
     "bash".to_string()
+}
+
+impl JobConfig {
+    pub fn from_yaml(path: &str) -> Result<JobConfig, Box<dyn std::error::Error>> {
+        return Self::from_str(&fs::read_to_string(path)?);
+    }
+
+    pub fn from_str(yaml: &str) -> Result<JobConfig, Box<dyn std::error::Error>> {
+        let config: JobConfig = serde_yaml::from_str(yaml)?;
+
+        // check entrypoint
+        if !config.templates.contains_key(&config.entrypoint) {
+            return Err(Error::Message(format!(
+                "invalid entrypoint, no template names '{}'",
+                config.entrypoint
+            ))
+            .into());
+        }
+
+        return Ok(config);
+    }
 }
 
 #[cfg(test)]
@@ -164,5 +205,26 @@ templates:
 "#;
         let deserialized_config: JobConfig = serde_yaml::from_str(yaml_str).unwrap();
         assert_eq!(config, deserialized_config);
+    }
+
+    #[test]
+    fn test_from_str() {
+        let yaml_str = r#"
+---
+name: job
+entrypoint: main
+templates:
+  main2:
+    tasks:
+    - - script: echo hello
+        "#;
+        if let Err(err) = JobConfig::from_str(&yaml_str) {
+            assert_eq!(
+                err.to_string(),
+                "invalid entrypoint, no template names 'main'".to_string()
+            );
+        } else {
+            panic!("should not find template")
+        }
     }
 }
