@@ -168,7 +168,7 @@ templates:
     tasks:
     - - script: echo hello
 "#;
-        let deserialized_config: JobConfig = serde_yaml::from_str(yaml_str).unwrap();
+        let deserialized_config = JobConfig::from_str(yaml_str).unwrap();
         assert_eq!(config, deserialized_config);
     }
 
@@ -223,7 +223,7 @@ templates:
           working_dir: /home
           labels: [second, third]
 "#;
-        let deserialized_config: JobConfig = serde_yaml::from_str(yaml_str).unwrap();
+        let deserialized_config = JobConfig::from_str(yaml_str).unwrap();
         assert_eq!(config, deserialized_config);
     }
 
