@@ -37,12 +37,15 @@ pub struct JobConfig {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
+pub struct ParallelTasks(Vec<TaskConfig>);
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Template {
     /// template level limits the max total parallel tasks that can execute at the same time
     pub parallelism: Option<i32>,
     /// a series of sequential/parallel tasks
-    pub tasks: Vec<Vec<TaskConfig>>,
+    pub tasks: Vec<ParallelTasks>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
@@ -109,7 +112,7 @@ impl JobConfig {
         // check TaskKind template
         for template in config.templates.values() {
             for task_group in &template.tasks {
-                for task in task_group {
+                for task in &task_group.0 {
                     match task.kind {
                         TaskKind::Template { template: ref t } => {
                             if !config.templates.contains_key(t) {
@@ -145,7 +148,7 @@ mod tests {
             templates: collection! {
                 "main".to_string() => Template {
                     parallelism: None,
-                    tasks: vec![vec![TaskConfig {
+                    tasks: vec![ParallelTasks(vec![TaskConfig {
                         name: "".to_string(),
                         labels: TaskLabels(vec![]),
                         kind: TaskKind::Script {
@@ -154,7 +157,7 @@ mod tests {
                             executor_args: vec![],
                             working_dir: ".".to_string(),
                         },
-                    }]],
+                    }])],
                 }
             },
         };
@@ -181,17 +184,17 @@ templates:
             templates: collection! {
                 "main".to_string() => Template {
                     parallelism: None,
-                    tasks: vec![vec![TaskConfig {
+                    tasks: vec![ParallelTasks(vec![TaskConfig {
                         name: "".to_string(),
                         labels: TaskLabels(vec!["first".to_string()]),
                         kind: TaskKind::Template {
                             template: "run_it".to_string(),
                         },
-                    }]],
+                    }])],
                 },
                 "run_it".to_string() => Template {
                     parallelism: None,
-                    tasks: vec![vec![TaskConfig {
+                    tasks: vec![ParallelTasks(vec![TaskConfig {
                         name: "".to_string(),
                         labels: TaskLabels(vec!["second".to_string(), "third".to_string()]),
                         kind: TaskKind::Script {
@@ -200,7 +203,7 @@ templates:
                             executor_args: vec!["-u".to_string()],
                             working_dir: "/home".to_string(),
                         },
-                    }]],
+                    }])],
                 },
             },
         };
