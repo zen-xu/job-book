@@ -81,7 +81,7 @@ pub struct ScriptConfig {
     #[serde(default = "default_executor")]
     pub executor: String,
     #[serde(default)]
-    pub executor_args: Vec<String>,
+    pub executor_opts: String,
     /// working dir
     #[serde(default = "default_working_dir")]
     pub working_dir: String,
@@ -157,7 +157,7 @@ mod tests {
                         kind: TaskKind::Script(ScriptConfig{
                             source: "echo hello".to_string(),
                             executor: "bash".to_string(),
-                            executor_args: vec![],
+                            executor_opts: "".to_string(),
                             working_dir: ".".to_string(),
                         }),
                     }])],
@@ -203,15 +203,13 @@ templates:
                         kind: TaskKind::Script(ScriptConfig{
                             source: "print(\"hello\")".to_string(),
                             executor: "python".to_string(),
-                            executor_args: vec!["-u".to_string()],
+                            executor_opts: "-u".to_string(),
                             working_dir: "/home".to_string(),
                         }),
                     }])],
                 },
             },
         };
-
-        // println!("{}", serde_yaml::to_string(&config).unwrap());
 
         let yaml_str = r#"
 ---
@@ -227,7 +225,7 @@ templates:
     tasks:
       - - source: "print(\"hello\")"
           executor: python
-          executor_args: [-u]
+          executor_opts: -u
           working_dir: /home
           labels: [second, third]
 "#;
@@ -269,7 +267,7 @@ templates:
     tasks:
       - - source: "print(\"hello\")"
           executor: python
-          executor_args: [-u]
+          executor_opts: -u
           working_dir: /home
           labels: [second, third]
         "#;
