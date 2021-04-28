@@ -76,7 +76,7 @@ pub enum TaskKind {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct ScriptConfig {
     /// script body
-    script: String,
+    source: String,
     /// script language
     #[serde(default = "default_executor")]
     executor: String,
@@ -155,7 +155,7 @@ mod tests {
                         name: "".to_string(),
                         labels: TaskLabels(vec![]),
                         kind: TaskKind::Script(ScriptConfig{
-                            script: "echo hello".to_string(),
+                            source: "echo hello".to_string(),
                             executor: "bash".to_string(),
                             executor_args: vec![],
                             working_dir: ".".to_string(),
@@ -172,7 +172,7 @@ entrypoint: main
 templates:
   main:
     tasks:
-    - - script: echo hello
+    - - source: echo hello
 "#;
         let deserialized_config = JobConfig::from_str(yaml_str).unwrap();
         assert_eq!(config, deserialized_config);
@@ -201,7 +201,7 @@ templates:
                         name: "".to_string(),
                         labels: TaskLabels(vec!["second".to_string(), "third".to_string()]),
                         kind: TaskKind::Script(ScriptConfig{
-                            script: "print(\"hello\")".to_string(),
+                            source: "print(\"hello\")".to_string(),
                             executor: "python".to_string(),
                             executor_args: vec!["-u".to_string()],
                             working_dir: "/home".to_string(),
@@ -225,7 +225,7 @@ templates:
           labels: [first]
   run_it:
     tasks:
-      - - script: "print(\"hello\")"
+      - - source: "print(\"hello\")"
           executor: python
           executor_args: [-u]
           working_dir: /home
@@ -244,7 +244,7 @@ entrypoint: main
 templates:
   main2:
     tasks:
-    - - script: echo hello
+    - - source: echo hello
         "#;
         if let Err(err) = JobConfig::from_str(&yaml_str) {
             assert_eq!(
@@ -267,7 +267,7 @@ templates:
           labels: [first]
   run_it:
     tasks:
-      - - script: "print(\"hello\")"
+      - - source: "print(\"hello\")"
           executor: python
           executor_args: [-u]
           working_dir: /home
