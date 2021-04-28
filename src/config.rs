@@ -76,15 +76,15 @@ pub enum TaskKind {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct ScriptConfig {
     /// script body
-    source: String,
+    pub source: String,
     /// script language
     #[serde(default = "default_executor")]
-    executor: String,
+    pub executor: String,
     #[serde(default)]
-    executor_args: Vec<String>,
+    pub executor_args: Vec<String>,
     /// working dir
     #[serde(default = "default_working_dir")]
-    working_dir: String,
+    pub working_dir: String,
 }
 
 fn default_working_dir() -> String {
