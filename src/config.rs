@@ -70,18 +70,21 @@ pub enum TaskKind {
         /// template name
         template: String,
     },
-    Script {
-        /// script body
-        script: String,
-        /// script language
-        #[serde(default = "default_executor")]
-        executor: String,
-        #[serde(default)]
-        executor_args: Vec<String>,
-        /// working dir
-        #[serde(default = "default_working_dir")]
-        working_dir: String,
-    },
+    Script(ScriptConfig),
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+pub struct ScriptConfig {
+    /// script body
+    script: String,
+    /// script language
+    #[serde(default = "default_executor")]
+    executor: String,
+    #[serde(default)]
+    executor_args: Vec<String>,
+    /// working dir
+    #[serde(default = "default_working_dir")]
+    working_dir: String,
 }
 
 fn default_working_dir() -> String {
@@ -151,12 +154,12 @@ mod tests {
                     tasks: vec![ParallelTasks(vec![TaskConfig {
                         name: "".to_string(),
                         labels: TaskLabels(vec![]),
-                        kind: TaskKind::Script {
+                        kind: TaskKind::Script(ScriptConfig{
                             script: "echo hello".to_string(),
                             executor: "bash".to_string(),
                             executor_args: vec![],
                             working_dir: ".".to_string(),
-                        },
+                        }),
                     }])],
                 }
             },
@@ -197,16 +200,18 @@ templates:
                     tasks: vec![ParallelTasks(vec![TaskConfig {
                         name: "".to_string(),
                         labels: TaskLabels(vec!["second".to_string(), "third".to_string()]),
-                        kind: TaskKind::Script {
+                        kind: TaskKind::Script(ScriptConfig{
                             script: "print(\"hello\")".to_string(),
                             executor: "python".to_string(),
                             executor_args: vec!["-u".to_string()],
                             working_dir: "/home".to_string(),
-                        },
+                        }),
                     }])],
                 },
             },
         };
+
+        // println!("{}", serde_yaml::to_string(&config).unwrap());
 
         let yaml_str = r#"
 ---
