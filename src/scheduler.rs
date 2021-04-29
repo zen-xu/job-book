@@ -14,7 +14,7 @@ pub struct Scheduler {
 }
 
 impl Scheduler {
-    fn new(job_config: JobConfig) -> Self {
+    pub fn new(job_config: JobConfig) -> Self {
         Scheduler { job_config }
     }
 }
