@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{self, Error, Write};
+use std::io;
+use std::io::Write;
 use std::process::{Command, Output, Stdio};
 
 use tempfile::tempdir;
 
-use crate::config::{self, JobConfig, ParallelTasks, ScriptConfig, TaskConfig, TaskLabels};
-use crate::scheduler::StatusPhase::Running;
+use crate::config::{JobConfig, ParallelTasks, ScriptConfig, TaskLabels};
 
 pub struct Scheduler {
     job_config: JobConfig,
@@ -106,7 +106,7 @@ cd {}
             }
         }
 
-        return result;
+        result
     }
 }
 
@@ -157,7 +157,7 @@ mod tests {
             failed_reason: "".to_string(),
         };
 
-        let result = task.run(Stdio::piped());
+        let _ = task.run(Stdio::piped());
 
         match task.status_phase {
             StatusPhase::Failed => {
